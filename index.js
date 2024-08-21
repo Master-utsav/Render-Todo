@@ -34,9 +34,13 @@ function toggleEditItem(id) {
     todos = todos.map((todo) => {
         if (todo.todoId === id) {
             if (todo.isEditing) {
-            title = document.getElementById(todo.TodoTextId).value;
-            if (title.trim() === "") return;
-            todo.title = title;
+                 const prevTodo = todo.title
+                const title = document.getElementById(todo.TodoTextId).value;
+                if(title.trim() === "") {
+                 todo.title = prevTodo
+                } else {
+                todo.title = title
+                }
             }
             todo.isEditing = !todo.isEditing;
         }
