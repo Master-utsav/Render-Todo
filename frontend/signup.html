@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+    <div class="w-full max-w-md bg-gray-800 rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-center mb-6">Sign Up</h1>
+        <form id="signup-form">
+            <div class="mb-4">
+                <input type="email" id="signup-email" placeholder="Email" class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            </div>
+            <div class="mb-4">
+                <input type="password" id="signup-password" placeholder="Password" class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            </div>
+            <div class="mb-4">
+                <input type="password" id="signup-confirm-password" placeholder="Confirm Password" class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            </div>
+            <button type="submit" class="w-full p-3 bg-green-500 rounded-lg text-white font-bold hover:bg-green-600 transition">Sign Up</button>
+        </form>
+        <p class="mt-4 text-center">
+            Already have an account? <a href="login.html" class="text-blue-500">Login</a>
+        </p>
+    </div>
+    <script src="./dist/signup.js" type="module"></script>
+</body>
+
+</html>
