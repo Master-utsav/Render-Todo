@@ -57,7 +57,7 @@ async function addItem() {
 
     const response = await fetch("https://week6-todo-backend.onrender.com/todos/add", {
         method: "POST",
-        headers: headers,
+        headers: headers.token,
         body: JSON.stringify({ title }),
     });
 
@@ -118,7 +118,7 @@ async function toggleEditItem(id) {
 
         const response = await fetch(`https://week6-todo-backend.onrender.com/todos/updateText/${id}`, {
             method: "PATCH",
-            headers: headers,
+            headers: headers.token,
             body: JSON.stringify({ title: newTitle }),
         });
 
@@ -193,6 +193,7 @@ function renderTodos(todos) {
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('token');
     checkAuth();
+    window.location.href = '../index.html';
 });
 
 // Add event listener for adding todos
