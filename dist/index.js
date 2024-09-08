@@ -7,19 +7,23 @@ const logoutBtn = document.getElementById("logout-btn");
 
 let todos = [];
 
-
 // Function to get the token from localStorage
 function getToken() {
     return localStorage.getItem('token');
 }
 
-const token = getToken();
-const headers = {
-    'Content-Type': 'application/json',
-    'token': token
-};
+// Function to set the headers with the token
+function getHeaders() {
+    const token = getToken();
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+}
+
 // Check if user is logged in
 function checkAuth() {
+    const token = getToken();
     if (token) {
         loginBtn.classList.add('hidden');
         signupBtn.classList.add('hidden');
@@ -35,8 +39,8 @@ function checkAuth() {
 // Fetch all todos for the authenticated user
 async function fetchTodos() {
     const response = await fetch("https://week6-todo-backend.onrender.com/todos/", {
-        headers: headers.token
-    })
+        headers: getHeaders()
+    });
 
     if (response.ok) {
         todos = await response.json();
@@ -57,7 +61,7 @@ async function addItem() {
 
     const response = await fetch("https://week6-todo-backend.onrender.com/todos/add", {
         method: "POST",
-        headers: headers.token,
+        headers: getHeaders(),
         body: JSON.stringify({ title }),
     });
 
@@ -75,7 +79,7 @@ async function addItem() {
 async function deleteItem(id) {
     const response = await fetch(`https://week6-todo-backend.onrender.com/todos/delete/${id}`, {
         method: "DELETE",
-        headers:  headers.token
+        headers: getHeaders()
     });
 
     if (response.ok) {
@@ -88,10 +92,9 @@ async function deleteItem(id) {
 
 // Handle toggling the completion status of a todo
 async function checkItem(id) {
-
     const response = await fetch(`https://week6-todo-backend.onrender.com/todos/update/${id}`, {
         method: "PATCH",
-        headers:  headers.token
+        headers: getHeaders()
     });
 
     if (response.ok) {
@@ -118,7 +121,7 @@ async function toggleEditItem(id) {
 
         const response = await fetch(`https://week6-todo-backend.onrender.com/todos/updateText/${id}`, {
             method: "PATCH",
-            headers: headers.token,
+            headers: getHeaders(),
             body: JSON.stringify({ title: newTitle }),
         });
 
