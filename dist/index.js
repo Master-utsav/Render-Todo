@@ -25,7 +25,7 @@ function getHeaders() {
 // Check if user is logged in
 function checkAuth() {
     const token = getHeaders();
-    if (token.token) {
+    if (token.token !== null) {
         loginBtn.classList.add('hidden');
         signupBtn.classList.add('hidden');
         logoutBtn.classList.remove('hidden');
