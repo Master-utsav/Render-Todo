@@ -10,7 +10,7 @@ const userTime = document.getElementById("time-input");
 
 let todos = [];
 
-const api = "http://localhost:8160";
+const api = "http://localhost:8160"; // upadte this as per your url
 function getToken() {
     return localStorage.getItem('token');
 }
