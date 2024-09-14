@@ -1,3 +1,6 @@
+
+const api = "http://localhost:8160"
+
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -11,7 +14,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     }
 
     try {
-        const response = await fetch('https://week6-todo-backend.onrender.com/user/signup', {
+        const response = await fetch(`${api}/user/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

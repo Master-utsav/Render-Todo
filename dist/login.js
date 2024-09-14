@@ -1,3 +1,6 @@
+
+const api = "http://localhost:8160"
+
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -5,7 +8,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const password = document.getElementById('login-password').value;
 
     try {
-        const response = await fetch('https://week6-todo-backend.onrender.com/user/login', {
+        const response = await fetch(`${api}/user/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

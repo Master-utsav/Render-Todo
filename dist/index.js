@@ -5,11 +5,12 @@ const parent = document.getElementById("todo-parent");
 const signupBtn = document.getElementById("signup-btn");
 const loginBtn = document.getElementById("login-btn");
 const logoutBtn = document.getElementById("logout-btn");
-const userDate = document.getElementById("date-input")
-const userTime = document.getElementById("time-input")
+const userDate = document.getElementById("date-input");
+const userTime = document.getElementById("time-input");
 
 let todos = [];
 
+const api = "http://localhost:8160";
 function getToken() {
     return localStorage.getItem('token');
 }
@@ -37,16 +38,17 @@ function checkAuth() {
 }
 
 async function fetchTodos() {
+    const head = getHeaders();
     try {
-        const response = await fetch("https://week6-todo-backend.onrender.com/todos/", {
-            headers: getHeaders()
+        const response = await fetch(`${api}/todos/`, {
+            headers: {token : head.token}
         });
 
         if (response.ok) {
             todos = await response.json();
             renderTodos(todos);  
         } else {
-            alert("Failed to fetch todos. Please log in.");
+            alert("Failed to fetch todos. Please logIn or Add todo.");
         }
     } catch (error) {
         console.error("Error fetching todos:", error);
@@ -65,7 +67,7 @@ async function addItem() {
     const formattedDate = date.toISOString();  
 
     try {
-        const response = await fetch("https://week6-todo-backend.onrender.com/todos/add", {
+        const response = await fetch(`${api}/todos/add`, {
             method: "POST",
             headers: getHeaders(),
             body: JSON.stringify({ title, completionTime: formattedDate }), 
@@ -84,15 +86,15 @@ async function addItem() {
     }
 }
 
-async function deleteItem(id) {
+async function deleteItem(_id) {
     try {
-        const response = await fetch(`https://week6-todo-backend.onrender.com/todos/delete/${id}`, {
+        const response = await fetch(`${api}/todos/delete/${_id}`, {
             method: "DELETE",
             headers: getHeaders()
         });
 
         if (response.ok) {
-            todos = todos.filter((todo) => todo.id !== id);
+            todos = todos.filter((todo) => todo._id !== _id);
             renderTodos(todos);
         } else {
             alert("Failed to delete todo.");
@@ -102,9 +104,9 @@ async function deleteItem(id) {
     }
 }
 
-async function checkItem(id) {
+async function checkItem(_id) {
     try {
-        const response = await fetch(`https://week6-todo-backend.onrender.com/todos/update/${id}`, {
+        const response = await fetch(`${api}/todos/update/${_id}`, {
             method: "PATCH",
             headers: getHeaders()
         });
@@ -119,11 +121,11 @@ async function checkItem(id) {
     }
 }
 
-async function toggleEditItem(id) {
-    const todo = todos.find((todo) => todo.id === id);
+async function toggleEditItem(_id) {
+    const todo = todos.find((todo) => todo._id === _id);
 
     if (todo.isEditing) {
-        const titleInput = document.getElementById(`todo-title-${id}`);
+        const titleInput = document.getElementById(`todo-title-${_id}`);
         const newTitle = titleInput.value.trim();
 
         if (newTitle === "") {
@@ -133,7 +135,7 @@ async function toggleEditItem(id) {
         }
 
         try {
-            const response = await fetch(`https://week6-todo-backend.onrender.com/todos/updateText/${id}`, {
+            const response = await fetch(`${api}/todos/updateText/${_id}`, {
                 method: "PATCH",
                 headers: getHeaders(),
                 body: JSON.stringify({ title: newTitle }),
@@ -153,6 +155,12 @@ async function toggleEditItem(id) {
     renderTodos(todos);
 }
 
+function formatDateTime(dateTime) {
+    const date = new Date(dateTime);
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+    return date.toLocaleDateString('en-GB', options).replace(',', '');
+}
+
 function renderTodos(todos) {
     parent.innerHTML = "";
     todos.forEach((todo) => {
@@ -166,26 +174,29 @@ function renderTodos(todos) {
             todoClasses = "bg-transparent border-none text-gray-500 line-through focus:outline-none";
         }
 
+        const formattedCompletionTime = todo.completionTime ? formatDateTime(todo.completionTime) : 'Not set';
+
         parent.innerHTML += `
-            <div id="todo-${todo.id}" class="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
-                <div class="flex items-center space-x-3">
-                    <input type="checkbox" id="todo-check-${todo.id}" ${todo.isCompleted ? 'checked' : ''} class="form-checkbox h-5 w-5 text-blue-500" />
+            <div id="todo-${todo._id}" class="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
+                <div class="flex justify-around  items-center space-x-3">
+                    <input type="checkbox" id="todo-check-${todo._id}" ${todo.isCompleted ? 'checked' : ''} class="form-checkbox h-5 w-5 text-blue-500" />
                     <input
                         type="text"
-                        id="todo-title-${todo.id}"
+                        id="todo-title-${todo._id}"
                         value="${todo.title}"
                         class="${todoClasses}"
                         ${todo.isEditing ? '' : 'readonly'}
                     />
+                    <span class="text-sm text-gray-400 text-center">${formattedCompletionTime}</span>
                 </div>
-                <div class="space-x-2">
+                <div class="space-y-2 flex flex-col justify-center">
                     <button
-                        id="todo-edit-${todo.id}"
+                        id="todo-edit-${todo._id}"
                         class="bg-${todo.isEditing ? 'green' : 'yellow'}-500 hover:bg-${todo.isEditing ? 'green' : 'yellow'}-600 text-white font-bold py-1 px-3 rounded-lg transition">
                         ${todo.isEditing ? 'Save' : 'Edit'}
                     </button>
                     <button
-                        id="todo-delete-${todo.id}"
+                        id="todo-delete-${todo._id}"
                         class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition">
                         Delete
                     </button>
@@ -195,14 +206,14 @@ function renderTodos(todos) {
     });
 
     todos.forEach((todo) => {
-        document.getElementById(`todo-delete-${todo.id}`).addEventListener('click', () => {
-            deleteItem(todo.id);
+        document.getElementById(`todo-delete-${todo._id}`).addEventListener('click', () => {
+            deleteItem(todo._id);
         });
-        document.getElementById(`todo-edit-${todo.id}`).addEventListener('click', () => {
-            toggleEditItem(todo.id);
+        document.getElementById(`todo-edit-${todo._id}`).addEventListener('click', () => {
+            toggleEditItem(todo._id);
         });
-        document.getElementById(`todo-check-${todo.id}`).addEventListener('click', () => {
-            checkItem(todo.id);
+        document.getElementById(`todo-check-${todo._id}`).addEventListener('click', () => {
+            checkItem(todo._id);
         });
     });
 }
