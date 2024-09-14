@@ -1,5 +1,5 @@
 
-const api = "http://localhost:8160"
+const api = "http://localhost:8160" // upadte this as per your url
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
