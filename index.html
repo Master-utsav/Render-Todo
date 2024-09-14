@@ -11,6 +11,8 @@
 <body class="bg-gray-900 text-white overflow-y-auto">
     <div class="w-full max-w-md bg-gray-800 rounded-lg shadow-lg p-6 mt-16 mx-auto">
         <h1 class="text-2xl font-bold text-center mb-6">Todo List</h1>
+
+        <!-- Task Input -->
         <div class="mb-4">
             <input
                 type="text"
@@ -18,15 +20,39 @@
                 placeholder="Enter your task"
                 class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button
-                id="task-btn"
-                class="w-full mt-3 p-3 bg-blue-500 rounded-lg text-white font-bold hover:bg-blue-600 transition">
-                Add
-            </button>
         </div>
-        <div id="todo-parent" class="space-y-3">
+
+        <!-- Date & Time Input -->
+        <div class="mb-4 flex space-x-3">
+            <input
+                type="date"
+                id="date-input"
+                class="w-1/2 p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min="2022-01-01"
+                required
+            />
+            <input
+                type="time"
+                id="time-input"
+                class="w-1/2 p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min="00:00"
+                required
+            />
+        </div>
+
+        <!-- Add Task Button -->
+        <button
+            id="task-btn"
+            class="w-full mt-3 p-3 bg-blue-500 rounded-lg text-white font-bold hover:bg-blue-600 transition">
+            Add
+        </button>
+
+        <!-- Todo Items -->
+        <div id="todo-parent" class="space-y-3 mt-6">
             <!-- Todo items will be rendered here -->
         </div>
+
+        <!-- Authentication Buttons -->
         <div id="auth-buttons" class="mt-6 flex justify-between">
             <a href="./signup.html">
                 <button id="signup-btn" class="px-4 py-2 bg-green-500 rounded-lg text-white font-bold hover:bg-green-600 transition">
@@ -42,10 +68,9 @@
                 Logout
             </button>
         </div>
-        
     </div>
 
-    <script src="./dist/index.js" ></script>
+    <script src="./dist/index.js"></script>
 </body>
 
 </html>

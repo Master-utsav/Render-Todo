@@ -5,15 +5,15 @@ const parent = document.getElementById("todo-parent");
 const signupBtn = document.getElementById("signup-btn");
 const loginBtn = document.getElementById("login-btn");
 const logoutBtn = document.getElementById("logout-btn");
+const userDate = document.getElementById("date-input")
+const userTime = document.getElementById("time-input")
 
 let todos = [];
 
-// Function to get the token from localStorage
 function getToken() {
     return localStorage.getItem('token');
 }
 
-// Function to set headers with the token
 function getHeaders() {
     const token = getToken();
     return {
@@ -22,10 +22,9 @@ function getHeaders() {
     };
 }
 
-// Check if user is logged in
 function checkAuth() {
-    const token = getHeaders();
-    if (token.token !== null) {
+    const token = getToken();
+    if (token !== null) {
         loginBtn.classList.add('hidden');
         signupBtn.classList.add('hidden');
         logoutBtn.classList.remove('hidden');
@@ -37,7 +36,6 @@ function checkAuth() {
     }
 }
 
-// Fetch all todos for the authenticated user
 async function fetchTodos() {
     try {
         const response = await fetch("https://week6-todo-backend.onrender.com/todos/", {
@@ -46,7 +44,7 @@ async function fetchTodos() {
 
         if (response.ok) {
             todos = await response.json();
-            renderTodos(todos);
+            renderTodos(todos);  
         } else {
             alert("Failed to fetch todos. Please log in.");
         }
@@ -55,7 +53,6 @@ async function fetchTodos() {
     }
 }
 
-// Handle adding a todo item
 async function addItem() {
     const title = input.value.trim();
 
@@ -63,12 +60,15 @@ async function addItem() {
         alert("Please enter a task");
         return;
     }
+    
+    const date = new Date(userDate.value + " " + userTime.value);
+    const formattedDate = date.toISOString();  
 
     try {
         const response = await fetch("https://week6-todo-backend.onrender.com/todos/add", {
             method: "POST",
             headers: getHeaders(),
-            body: JSON.stringify({ title }),
+            body: JSON.stringify({ title, completionTime: formattedDate }), 
         });
 
         if (response.ok) {
@@ -84,7 +84,6 @@ async function addItem() {
     }
 }
 
-// Handle deleting a todo item
 async function deleteItem(id) {
     try {
         const response = await fetch(`https://week6-todo-backend.onrender.com/todos/delete/${id}`, {
@@ -103,7 +102,6 @@ async function deleteItem(id) {
     }
 }
 
-// Handle toggling the completion status of a todo
 async function checkItem(id) {
     try {
         const response = await fetch(`https://week6-todo-backend.onrender.com/todos/update/${id}`, {
@@ -112,10 +110,7 @@ async function checkItem(id) {
         });
 
         if (response.ok) {
-            todos = todos.map((todo) => 
-                todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo
-            );
-            renderTodos(todos);
+            await fetchTodos();
         } else {
             alert("Failed to update todo status.");
         }
@@ -124,7 +119,6 @@ async function checkItem(id) {
     }
 }
 
-// Handle updating the text of a todo item
 async function toggleEditItem(id) {
     const todo = todos.find((todo) => todo.id === id);
 
@@ -134,7 +128,7 @@ async function toggleEditItem(id) {
 
         if (newTitle === "") {
             alert("Todo item cannot be empty.");
-            titleInput.value = todo.title; // Restore the previous value
+            titleInput.value = todo.title; 
             return;
         }
 
@@ -159,10 +153,19 @@ async function toggleEditItem(id) {
     renderTodos(todos);
 }
 
-// Render todos
 function renderTodos(todos) {
     parent.innerHTML = "";
     todos.forEach((todo) => {
+        let todoClasses = "bg-transparent border-none text-white focus:outline-none";
+    
+        if (todo.isCompleteTime && !todo.isCompleted) {
+            todoClasses = "bg-transparent border-none text-red-500 focus:outline-none";
+        }
+
+        if (todo.isCompleted) {
+            todoClasses = "bg-transparent border-none text-gray-500 line-through focus:outline-none";
+        }
+
         parent.innerHTML += `
             <div id="todo-${todo.id}" class="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
                 <div class="flex items-center space-x-3">
@@ -171,7 +174,7 @@ function renderTodos(todos) {
                         type="text"
                         id="todo-title-${todo.id}"
                         value="${todo.title}"
-                        class="bg-transparent border-none text-white focus:outline-none"
+                        class="${todoClasses}"
                         ${todo.isEditing ? '' : 'readonly'}
                     />
                 </div>
@@ -201,26 +204,18 @@ function renderTodos(todos) {
         document.getElementById(`todo-check-${todo.id}`).addEventListener('click', () => {
             checkItem(todo.id);
         });
-
-        if (todo.isCompleted) {
-            const inputText = document.getElementById(`todo-title-${todo.id}`);
-            inputText.classList.add('line-through', 'text-gray-500');
-        }
     });
 }
 
-// Handle logout
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('token');
     checkAuth();
     window.location.href = '../index.html';
 });
 
-// Add event listener for adding todos
 addBtn.addEventListener("click", () => {
     addItem();
 });
 
 checkAuth();
-
 window.addEventListener("load", checkAuth);
